@@ -1,0 +1,64 @@
+﻿@page "/downloder"
+@using Downloader.Shared.WebOperations;
+@using Downloader.Shared.Operations;
+<h3>Downloder</h3>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="card-title">Downloder</h5>
+    </div>
+    <div class="card-body">
+        <EditForm Model="@this" OnValidSubmit="StartDownloding">
+            <div class="mb-3">
+                <label for="downloadUrl" class="form-label">Enter URL to scrape</label>
+                <InputText id="downloadUrl" class="form-control" @bind-Value="_downloadUrl" />
+                <datalist id="urlSuggestions">
+                    @foreach (string url in urlSuggestions)
+                    {
+                        <option value="@url"></option>
+                    }
+                </datalist>
+            </div>
+            <div class="mb-3">
+                <label for="downloadUrl" class="form-label">Enter Path to Save</label>
+                <InputText id="pathToDownload" class="form-control" @bind-Value="_pathToDownload" aria-label="_pathToDownload" />
+                <datalist id="pathToDownload">
+                    @foreach (string url in urlSuggestions)
+                    {
+                        <option value="@url"></option>
+                    }
+                </datalist>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Start Scraping</button>
+        </EditForm>
+    </div>
+    @if (timeSpan.TotalSeconds != 0)
+    {
+    <h3>Time Nidded: @timeSpan.TotalSeconds s</h3>
+    }
+</div>
+
+@code {
+
+
+
+    private string _downloadUrl = string.Empty;
+    private List<string> urlSuggestions = new List<string> { "https://example.com", "https://example.org" };
+
+    private DownloderClass downloder = new();
+    private TimeSpan timeSpan;
+    private string _pathToDownload = Path.Combine(Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.Parent.Parent.Parent.FullName, "Downloads");
+
+    private async Task StartDownloding()
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        var fileName = Path.GetFileName(new Uri(_downloadUrl).LocalPath);
+        var savePath = Path.Combine("Downloads", fileName);
+
+        await downloder.DownloadResourceAsync(_downloadUrl, savePath);
+        stopwatch.Stop();
+        timeSpan = stopwatch.Elapsed;
+    }
+}

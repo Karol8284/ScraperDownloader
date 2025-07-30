@@ -1,0 +1,139 @@
+﻿@page "/scraper"
+@using Downloader.Shared.WebOperations;
+@using Downloader.Shared.Operations;
+@using System.Text.Json.Nodes;
+
+<h2 class="mt-4">Scraper</h2>
+<h3 class="text-body-danger">@error</h3>
+
+
+
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5 class="card-title">Scraper</h5>
+    </div>
+    <div class="card-body">
+        <EditForm Model="@this" OnValidSubmit="StartScraping">
+            <div class="mb-3">
+                <label for="scraperUrl" class="form-label">Enter URL to scrape</label>
+                <InputText id="scraperUrl" class="form-control" @bind-Value="_scraperUrl" />
+                <datalist id="urlSuggestions">
+                    @foreach (string url in urlSuggestions)
+                        {
+                            <option value="@url"></option>
+                        }
+                </datalist>
+            </div>
+            @* <div class="mb-3">
+                <label for="downloadUrl" class="form-label">Enter Path to Save</label>
+                <InputText id="pathToDownload" class="form-control" @bind-Value="_pathToDownload" aria-label="_pathToDownload" />
+                <datalist id="pathToDownload">
+                    @foreach (string url in urlSuggestions)
+                    {
+                        <option value="@url"></option>
+                    }
+                </datalist>
+            </div> *@
+            <button type="submit" class="btn btn-primary">Start Scraping</button>
+        </EditForm>
+    </div>
+</div>
+
+@if (scrapingResult != null)
+{
+    <div class="mt-5 p-4 bg-light rounded">
+        <h1>Scraping Results</h1>
+        <h3>Time Nidded: @timeSpan.TotalSeconds s</h3>
+        <br />
+
+        @if (scrapingResult.HyperLinks?.Any() == true)
+        {
+            <h3>HyperLinks: @scrapingResult.HyperLinks.Count</h3>
+            <ul class="list-group mb-3">
+                @foreach (var link in scrapingResult.HyperLinks)
+                {
+                    <li class="list-group-item">@link</li>
+                }
+            </ul>
+        }
+
+        @if (scrapingResult.ImageLinks?.Any() == true)
+        {
+            <h3>ImageLinks: @scrapingResult.ImageLinks.Count</h3>
+            <ul class="list-group mb-3">
+                @foreach (var link in scrapingResult.ImageLinks)
+                {
+                    <li class="list-group-item">@link</li>
+                }
+            </ul>
+        }
+
+        @if (scrapingResult.VideoLinks?.Any() == true)
+        {
+            <h3>VideoLinks: @scrapingResult.VideoLinks.Count</h3>
+            <ul class="list-group mb-3">
+                @foreach (var link in scrapingResult.VideoLinks)
+                {
+                    <li class="list-group-item">@link</li>
+                }
+            </ul>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(scrapingResult.TextContent))
+        {
+            <h3>Text</h3>
+            <p>@scrapingResult.TextContent</p>
+        }
+    </div>
+}
+
+
+@code {
+
+    private string _scraperUrl;
+    // private string _pathToDownload;
+    PageContent scrapingResult;
+    string error;
+    private List<string> urlSuggestions = new();
+    private TimeSpan timeSpan;
+
+    protected override async Task OnInitializedAsync()
+    {
+        urlSuggestions.Add("aaa");
+        urlSuggestions.Add("xxx");        
+    }
+
+    private async Task StartScraping()
+    {
+        urlSuggestions.Add(_scraperUrl);
+        try
+        {
+            DateTime start = DateTime.Now;
+
+            ScraperClass scraper = new();
+            scrapingResult = await scraper.ExtractContentAsync(_scraperUrl);
+
+            Console.WriteLine($"Scraping started for URL: {_scraperUrl}");
+
+            // FileEdit fileEdit = new FileEdit();
+            // string path = Directory.GetParent(AppContext.BaseDirectory).Parent.Parent.FullName;
+            // path = Path.Combine(path,"ResultData", "ScraperResults.txt");
+            // path = fileEdit.FindAvailableFileName(path, "Result1");
+            // fileEdit.Write(path, scrapingResult.ToJson() ,false);
+
+            DateTime end = DateTime.Now;
+            timeSpan = end - start;
+
+        }catch (Exception ex)
+        {
+            error = ex.Message;
+            Console.WriteLine($"Error during scraping: {ex.Message}");
+        }
+
+
+        await Task.Delay(1000);
+        Console.WriteLine($"Scraping started for URL: {_scraperUrl}");
+    }
+
+}

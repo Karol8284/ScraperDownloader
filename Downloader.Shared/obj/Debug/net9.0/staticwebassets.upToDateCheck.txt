@@ -1,0 +1,7 @@
+wwwroot\app.css
+wwwroot\bootstrap\bootstrap.min.css
+wwwroot\bootstrap\bootstrap.min.css.map
+wwwroot\favicon.png
+C:\My private programs\Programing\C#\.net maui hybrid and web app\Downloader\Downloader.Shared\wwwroot\app.css
+C:\My private programs\Programing\C#\.net maui hybrid and web app\Downloader\Downloader.Shared\wwwroot\bootstrap\bootstrap.min.css
+C:\My private programs\Programing\C#\.net maui hybrid and web app\Downloader\Downloader.Shared\wwwroot\bootstrap\bootstrap.min.css.map
